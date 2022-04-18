@@ -25,4 +25,8 @@ export PATH=$CUSTOMBIN:$PATH
 
 # terraform $*
 
-docker run --rm -it -v "$(pwd):/sec" aquasec/tfsec ./
+curl -O https://github.com/aquasecurity/tfsec/releases/download/v1.18.0/tfsec_1.18.0_linux_amd64.tar.gz
+
+tar xvf tfsec_1.18.0_linux_amd64.tar.gz
+
+tfsec_1.18.0_linux_amd64/bin/tfsec ./
