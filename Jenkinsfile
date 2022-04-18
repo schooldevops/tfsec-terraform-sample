@@ -1,7 +1,10 @@
-var dockerHome = tool 'myDocker'
-env.PATH = "${dockerHome}/bin:${env.PATH}"
+
 pipeline {
   agent { label 'linux'}
+  environment {
+    def dockerHome = tool 'myDocker'
+    env.PATH = "${dockerHome}/bin:${env.PATH}"
+  }
   options {
     skipDefaultCheckout(true)
   }
