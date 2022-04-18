@@ -10,8 +10,10 @@ pipeline {
       }
     }
     stage('Initialize') {
-        def dockerHome = tool 'myDocker'
+      script {
+        dockerHome = tool 'myDocker'
         env.PATH = "${dockerHome}/bin:${env.PATH}"
+      }
     }
     stage('checkout') {
       steps {
