@@ -21,6 +21,8 @@ CUSTOMBIN=$(pwd)/.bin
 #Add custom bin path to PATH environment
 export PATH=$CUSTOMBIN:$PATH
 
-$CUSTOMBIN/tfswitch -b $CUSTOMBIN/terraform
+# $CUSTOMBIN/tfswitch -b $CUSTOMBIN/terraform
 
-terraform $*
+# terraform $*
+
+docker run --rm -it -v "$(pwd):/sec" aquasec/tfsec ./
