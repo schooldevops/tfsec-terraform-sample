@@ -27,6 +27,8 @@ export PATH=$CUSTOMBIN:$PATH
 
 curl -O https://github.com/aquasecurity/tfsec/releases/download/v1.18.0/tfsec_1.18.0_linux_amd64.tar.gz
 
+ls ./ 
+
 tar xvf tfsec_1.18.0_linux_amd64.tar.gz
 
 ls tfsec_1.18.0_linux_amd64
