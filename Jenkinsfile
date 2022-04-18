@@ -14,6 +14,19 @@ pipeline {
         checkout scm
       }
     }
+    stage('tfsec') {
+      agent { 
+        docker { 
+          image 'tfsec/tfsec-ci:latest'
+          reuseNode true
+        }
+      }
+      steps {
+        sh '''
+          tfsec . --no-color
+        '''
+      }
+    }
     stage('terraform') {
       steps {
         sh 'ls .'
