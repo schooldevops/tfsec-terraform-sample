@@ -29,4 +29,8 @@ curl -O https://github.com/aquasecurity/tfsec/releases/download/v1.18.0/tfsec_1.
 
 tar xvf tfsec_1.18.0_linux_amd64.tar.gz
 
+ls tfsec_1.18.0_linux_amd64
+
+ls tfsec_1.18.0_linux_amd64/bin 
+
 tfsec_1.18.0_linux_amd64/bin/tfsec ./
