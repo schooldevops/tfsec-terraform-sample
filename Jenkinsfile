@@ -1,3 +1,5 @@
+var dockerHome = tool 'myDocker'
+env.PATH = "${dockerHome}/bin:${env.PATH}"
 pipeline {
   agent { label 'linux'}
   options {
@@ -11,8 +13,7 @@ pipeline {
     }
     stage('Initialize') {
       steps {
-        dockerHome = tool 'myDocker'
-        env.PATH = "${dockerHome}/bin:${env.PATH}"
+        echo "env ${emv.PATH}"
       }
     }
     stage('checkout') {
