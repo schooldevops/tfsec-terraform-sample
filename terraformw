@@ -1,39 +1,32 @@
 #!/bin/bash 
 
-# based on https://tfswitch.warrensbox.com/Continuous-Integration/
+echo "Check terraform with tfsec"
 
-echo "Installing tfswitch locally"
-
-# Get the installer on to your machine
-# wget -N -c https://raw.githubusercontent.com/warrensbox/terraform-switcher/release/install.sh
-curl -O  https://raw.githubusercontent.com/warrensbox/terraform-switcher/release/install.sh
-
-
-# Make installer executable
-chmod 755 install.sh
-
-# Install tfswitch in a location you have permission
-./install.sh -b $(pwd)/.bin
-
-# set custom bin path
-CUSTOMBIN=$(pwd)/.bin
-
-#Add custom bin path to PATH environment
-export PATH=$CUSTOMBIN:$PATH
-
-# $CUSTOMBIN/tfswitch -b $CUSTOMBIN/terraform
-
-# terraform $*
-
-apt-get install wget -y
-
-# curl https://github.com/aquasecurity/tfsec/releases/download/v1.18.0/tfsec_1.18.0_linux_arm64.tar.gz -o tfsec_1.18.0_linux_arm64.tar.gz
-
-ls ./ 
-
+# wget https://github.com/aquasecurity/tfsec/releases/download/v1.18.0/tfsec_1.18.0_linux_arm64.tar.gz
 tar zxvf tfsec_1.18.0_linux_arm64.tar.gz
 
 ls ./
 
+./tfsec ./ --no-color
 
-./tfsec ./
+# echo "Installing tfswitch locally"
+
+# # Get the installer on to your machine
+# # wget -N -c https://raw.githubusercontent.com/warrensbox/terraform-switcher/release/install.sh
+# curl -O  https://raw.githubusercontent.com/warrensbox/terraform-switcher/release/install.sh
+
+# # Make installer executable
+# chmod 755 install.sh
+
+# # Install tfswitch in a location you have permission
+# ./install.sh -b $(pwd)/.bin
+
+# # set custom bin path
+# CUSTOMBIN=$(pwd)/.bin
+
+# #Add custom bin path to PATH environment
+# export PATH=$CUSTOMBIN:$PATH
+
+# $CUSTOMBIN/tfswitch -b $CUSTOMBIN/terraform
+
+# terraform $*
