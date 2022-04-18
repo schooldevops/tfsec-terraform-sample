@@ -31,6 +31,8 @@ ls ./
 
 tar xvf tfsec_1.18.0_linux_amd64.tar.gz
 
+ls ./
+
 ls tfsec_1.18.0_linux_amd64
 
 ls tfsec_1.18.0_linux_amd64/bin 
