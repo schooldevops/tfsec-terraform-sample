@@ -17,7 +17,7 @@ pipeline {
     stage('terraform') {
       steps {
         sh 'chmod +x -R ${env.WORKSPACE}'
-        sh 'chmod +x -R terraformw'
+        sh 'chmod +x -R ./terraformw'
         sh './terraformw apply -auto-approve -no-color'
       }
     }
