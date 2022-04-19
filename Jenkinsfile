@@ -35,14 +35,14 @@ pipeline {
       post {
         always { 
           echo "========= Check tfsec test results ========="
-          junit allowEmptyResults: true, testResults: 'tfsec_results.xml'
+          junit allowEmptyResults: true, testResults: 'tfsec_results.xml', skipPublishingChecks: true
         }
-        // success {
-        //   echo "Tfsec passed"
-        // }
-        // failure {
-        //   echo "Tfsec failed"
-        // }
+        success {
+          echo "Tfsec passed"
+        }
+        failure {
+          echo "Tfsec failed"
+        }
       }
     }
     // stage('terraform') {
