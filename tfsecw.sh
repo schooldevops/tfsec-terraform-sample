@@ -18,17 +18,9 @@ mkdir "$(pwd)/tfsec_dir"
 
 tar xzvf tfsec_1.18.0_linux_arm64.tar.gz -C "$(pwd)/tfsec_dir"
 
-ls -alt "$(pwd)/tfsec_dir"
-
-# chmod -R 755 "$(pwd)/tfsec_dir"
+# ls -alt "$(pwd)/tfsec_dir"
 
 $(pwd)/tfsec_dir/tfsec . -f junit > tfsec_results.xml
 
-# chmod 755 tfsec
-
-# ./tfsec . -f junit > tfsec_results.xml
-
-# ls -lat $(pwd)
-
-# echo "------------------------------------------------"
-# cat tfsec_results.xml
+echo "------------------------------------------------"
+cat tfsec_results.xml
