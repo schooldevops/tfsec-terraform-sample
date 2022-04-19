@@ -30,7 +30,7 @@ pipeline {
         // sh 'docker run --rm -i -v "$(pwd):/src" aquasec/tfsec /src --no-color'
         sh 'chmod 755 ./tfsecw.sh'
         sh './tfsecw.sh'
-        junit allowEmptyResults: true, testResults: 'tfsec_results.xml', skipPublishingChecks: true
+        // junit allowEmptyResults: true, testResults: 'tfsec_results.xml', skipPublishingChecks: true
 
       }
     }
