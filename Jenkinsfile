@@ -60,7 +60,7 @@ pipeline {
       }
       post {
         always { 
-          echo "=========always========="
+          echo "========= Check tfsec test results ========="
           junit allowEmptyResults: true, testResults: 'tfsec_results.xml'
         }
         success {

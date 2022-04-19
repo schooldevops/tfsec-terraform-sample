@@ -12,7 +12,7 @@ echo "$(pwd)"
 # docker run --rm -v "$(pwd):/src" aquasec/tfsec /src -f junit > tfsec_results.xml
 docker run --rm -v "$(pwd):/src" aquasec/tfsec /src --no-color
 
-ls -lat ./
+ls -lat $(pwd)
 
 echo "------------------------------------------------"
 cat tfsec_results.xml
