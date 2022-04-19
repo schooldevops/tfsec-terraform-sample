@@ -24,49 +24,50 @@ pipeline {
         checkout scm
       }
     }
-    stage("Test Terraform files"){
-      steps{
-        echo "========Executing Test case for Terraform files======="
-        container('tfsec'){
-          dir('terraform') {
-            sh "echo \$(pwd)"
-            sh "tfsec -f junit > tfsec_test.xml"
-          }
-        }
-      }
-      post{
-        always{
-          echo "========always========"
-          dir('terraform') {
-            junit checksName: 'Terraform security checks', testResults: "tfsec_test.xml"
-          }
-        }
-        success{
-          echo "Terraform test case passed"
-        }
-        failure{
-          echo "Terraform test case failed"
-        }
-      }
-    }
+    // stage("Test Terraform files"){
+    //   steps{
+    //     echo "========Executing Test case for Terraform files======="
+    //     container('tfsec'){
+    //       dir('terraform') {
+    //         sh "echo \$(pwd)"
+    //         sh "tfsec -f junit > tfsec_test.xml"
+    //       }
+    //     }
+    //   }
+    //   post{
+    //     always{
+    //       echo "========always========"
+    //       dir('terraform') {
+    //         junit checksName: 'Terraform security checks', testResults: "tfsec_test.xml"
+    //       }
+    //     }
+    //     success{
+    //       echo "Terraform test case passed"
+    //     }
+    //     failure{
+    //       echo "Terraform test case failed"
+    //     }
+    //   }
+    // }
     
     stage('tfsec') {
-      // agent {
-      //   docker { 
-      //     image 'tfsec/tfsec-ci:v0.57.1'
-      //     reuseNode true
-      //   }
-      // }
-      // steps {
-      //   sh '''
-      //     tfsec . --no-color
-      //   '''
-      // }
       steps {
         script{ 
           sh 'chmod 755 ./tfsecw.sh'
           sh 'cat main.tf'
           sh './tfsecw.sh'
+        }
+      }
+      post {
+        always { 
+          echo "=========always========="
+          junit checksName: 'Terraform security checks', testResults: "tfsec_reslt.xml"
+        }
+        success {
+          echo "Tfsec passed"
+        }
+        failure {
+          echo "Tfsec failed"
         }
       }
     }
