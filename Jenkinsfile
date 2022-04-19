@@ -61,7 +61,13 @@ pipeline {
       post {
         always { 
           echo "=========always========="
-          junit 'tfsec_results.xml'
+          // junit 'tfsec_results.xml'
+          junitReporter: {
+            outputDir: './',
+            outputFile: 'tfsec_results.xml',
+            useBrowserName: false,
+            xmlVersion: null
+          }
         }
         success {
           echo "Tfsec passed"
