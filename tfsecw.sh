@@ -13,4 +13,4 @@ ls ./
 
 echo "----------------------- Run tfsec with docker"
 
-docker run --rm -it -v "$(pwd):/src" aquasec/tfsec /src --no-color
+docker run --rm -v "$(pwd):/src" aquasec/tfsec /src --no-color
