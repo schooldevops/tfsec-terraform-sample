@@ -457,6 +457,7 @@ output "jenkins_terraform" {
 ## 실행결과 (비정상 케이스)
 
 - 이제는 main.tf에 문제가 있는 경우이다. 
+- transit_encryption_enabled = false, at_rest_encryption_enabled = false 으로 변경하였다. 
 
 ```py
 resource "aws_elasticache_replication_group" "bad_example" {
@@ -471,3 +472,52 @@ output "jenkins_terraform" {
 }
 ```
 
+![build_02](imgs/build_02.png)
+
+- 오류가 발생했음을 확인할 수 있다. 
+
+### tfsec 처리 결과 파일 확인하기
+
+- tfsec_results.xml 파일은 다음과 같이 문제가 생겼음을 확인할 수 있다. 
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="tfsec" failures="2" tests="2">
+	<testcase classname="main.tf" name="[aws-elasticache-enable-at-rest-encryption][HIGH] - Replication group does not have at-rest encryption enabled." time="0">
+		<failure message="Replication group does not have at-rest encryption enabled." type="">main.tf:5&#xA;&#xA;https://aquasecurity.github.io/tfsec/v1.18.0/checks/aws/elasticache/enable-at-rest-encryption/</failure>
+	</testcase>
+	<testcase classname="main.tf" name="[aws-elasticache-enable-in-transit-encryption][HIGH] - Replication group does not have transit encryption enabled." time="0">
+		<failure message="Replication group does not have transit encryption enabled." type="">main.tf:4&#xA;&#xA;https://aquasecurity.github.io/tfsec/v1.18.0/checks/aws/elasticache/enable-in-transit-encryption/</failure>
+	</testcase>
+</testsuite>
+```
+
+- 오류 파일에 오류 상세 정보를 확인할 수 있다. 
+
+### Jenkins 처리결과 확인하기. 
+
+```py
+... 생략
+Post stage
+[Pipeline] echo
+========= Check tfsec test results =========
+[Pipeline] junit
+Recording test results
+[Pipeline] error
+Error when executing unstable post condition:
+hudson.AbortException: TfSec Unstable
+	at org.jenkinsci.plugins.workflow.steps.ErrorStep$Execution.run(ErrorStep.java:64)
+	at org.jenkinsci.plugins.workflow.steps.ErrorStep$Execution.run(ErrorStep.java:51)
+
+... 생략 
+
+```
+
+- TfSec Unstable 으로 파이프라인 작업이 Abort 된것을 확인할 수 있다. 
+- 이후 Terraform 주식을 풀고 다음으로 진행할 수 있을 것이다. 
+
+## WrapUp
+
+- 지금까지 Jenkins를 설치하고, Tfsec + Terraform 을 진행하는 파이프라인을 생성했다. 
+- Terraform 을 배포하기 전에 Tfsec을 우선 처리하고, 문제가 발생하는 경우 fail_fast 로 다음 스텝을 스킵할 수 있다. 
+- 위 Jenkins Pipeline 을 변형하여 Git에 Terraform 파일이 Commit 이 되면 정적 분석을 수행하여 알림을 줄 수 도 있을 것이다. 
