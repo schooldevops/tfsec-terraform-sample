@@ -18,6 +18,8 @@ curl -fsSL https://github.com/aquasecurity/tfsec/releases/download/v1.18.0/tfsec
 
 tar xzvf tfsec_1.18.0_linux_arm64.tar.gz
 
+ls -alt .
+
 # tar xzvf tfsec_1.18.0_linux_arm64.tar.gz -C "$(pwd)/tfsec_dir"
 
 # ls -alt "$(pwd)/tfsec_dir"
