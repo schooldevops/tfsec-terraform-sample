@@ -61,20 +61,14 @@ pipeline {
       post {
         always { 
           echo "=========always========="
-          // junit 'tfsec_results.xml'
-          junitReporter: {
-            outputDir: './',
-            outputFile: 'tfsec_results.xml',
-            useBrowserName: false,
-            xmlVersion: null
-          }
+          junit skipPublishingChecks: true, testResults: 'tfsec_results.xml'
         }
-        success {
-          echo "Tfsec passed"
-        }
-        failure {
-          echo "Tfsec failed"
-        }
+        // success {
+        //   echo "Tfsec passed"
+        // }
+        // failure {
+        //   echo "Tfsec failed"
+        // }
       }
     }
     // stage('terraform') {
