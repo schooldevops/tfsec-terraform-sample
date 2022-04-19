@@ -25,11 +25,22 @@ pipeline {
       }
     }
     stage('tfsec') {
-      steps {
-        sh 'chmod 755 ./tfsecw.sh'
-        sh 'cat main.tf'
-        sh './tfsecw.sh'
+      agent {
+        docker { 
+          image 'tfsec/tfsec-ci:v0.57.1'
+          reuseNode true
+        }
       }
+      steps {
+        sh '''
+          tfsec . --no-color
+        '''
+      }
+      // steps {
+      //   sh 'chmod 755 ./tfsecw.sh'
+      //   sh 'cat main.tf'
+      //   sh './tfsecw.sh'
+      // }
     }
     stage('terraform') {
       steps {
