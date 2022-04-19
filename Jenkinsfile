@@ -24,23 +24,51 @@ pipeline {
         checkout scm
       }
     }
-    stage('tfsec') {
-      agent {
-        docker { 
-          image 'tfsec/tfsec-ci:v0.57.1'
-          reuseNode true
+    stage("Test Terraform files"){
+      steps{
+        echo "========Executing Test case for Terraform files======="
+        container('tfsec'){
+          dir('terraform') {
+            sh "echo \$(pwd)"
+            sh "tfsec -f junit > tfsec_test.xml"
+          }
         }
       }
-      steps {
-        sh '''
-          tfsec . --no-color
-        '''
+      post{
+        always{
+          echo "========always========"
+          dir('terraform') {
+            junit checksName: 'Terraform security checks', testResults: "tfsec_test.xml"
+          }
+        }
+        success{
+          echo "Terraform test case passed"
+        }
+        failure{
+          echo "Terraform test case failed"
+        }
       }
-      // steps {
-      //   sh 'chmod 755 ./tfsecw.sh'
-      //   sh 'cat main.tf'
-      //   sh './tfsecw.sh'
+    }
+    
+    stage('tfsec') {
+      // agent {
+      //   docker { 
+      //     image 'tfsec/tfsec-ci:v0.57.1'
+      //     reuseNode true
+      //   }
       // }
+      // steps {
+      //   sh '''
+      //     tfsec . --no-color
+      //   '''
+      // }
+      steps {
+        script{ 
+          sh 'chmod 755 ./tfsecw.sh'
+          sh 'cat main.tf'
+          sh './tfsecw.sh'
+        }
+      }
     }
     stage('terraform') {
       steps {
