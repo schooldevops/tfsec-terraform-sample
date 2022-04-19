@@ -40,6 +40,9 @@ pipeline {
         success {
           echo "Tfsec passed"
         }
+        unstable {
+          echo "TfSec Unstable"
+        }
         failure {
           echo "Tfsec failed"
         }
