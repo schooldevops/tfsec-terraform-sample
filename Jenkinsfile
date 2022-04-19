@@ -24,37 +24,11 @@ pipeline {
         checkout scm
       }
     }
-    // stage("Test Terraform files"){
-    //   steps{
-    //     echo "========Executing Test case for Terraform files======="
-    //     container('tfsec'){
-    //       dir('terraform') {
-    //         sh "echo \$(pwd)"
-    //         sh "tfsec -f junit > tfsec_test.xml"
-    //       }
-    //     }
-    //   }
-    //   post{
-    //     always{
-    //       echo "========always========"
-    //       dir('terraform') {
-    //         junit checksName: 'Terraform security checks', testResults: "tfsec_test.xml"
-    //       }
-    //     }
-    //     success{
-    //       echo "Terraform test case passed"
-    //     }
-    //     failure{
-    //       echo "Terraform test case failed"
-    //     }
-    //   }
-    // }
-    
     stage('tfsec') {
       steps {
         echo "=========== Execute tfsec ================="
         script{ 
-          sh 'docker run --rm -v "$(pwd):/src" aquasec/tfsec /src --no-color'
+          sh 'docker run --rm -v "$(pwd):/src" aquasec/tfsec /src/main.tf --no-color'
 
           // sh 'chmod 755 ./tfsecw.sh'
           // sh './tfsecw.sh'
