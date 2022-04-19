@@ -24,31 +24,37 @@ pipeline {
         checkout scm
       }
     }
-    stage('tfsec') {
-      steps {
-        echo "=========== Execute tfsec ================="
-        // sh 'docker run --rm -i -v "$(pwd):/src" aquasec/tfsec /src --no-color'
-        sh 'chmod 755 ./tfsecw.sh'
-        sh './tfsecw.sh'
-      }
+    try {
+      stage('tfsec') {
+        steps {
+          echo "=========== Execute tfsec ================="
+          // sh 'docker run --rm -i -v "$(pwd):/src" aquasec/tfsec /src --no-color'
+          sh 'chmod 755 ./tfsecw.sh'
+          sh './tfsecw.sh'
+        }
 
-      post {
-        always { 
-          echo "========= Check tfsec test results ========="
-          junit allowEmptyResults: true, testResults: 'tfsec_results.xml'
-        }
-        success {
-          echo "Tfsec passed" 
-        }
-        unstable {
-          currentBuild.result = 'ABORTED'
-          error "TfSec Unstable"
-        }
-        failure {
-          currentBuild.result = 'ABORTED'
-          error "Tfsec failed"
+        post {
+          always { 
+            echo "========= Check tfsec test results ========="
+            junit allowEmptyResults: true, testResults: 'tfsec_results.xml'
+          }
+          success {
+            echo "Tfsec passed" 
+          }
+          unstable {
+            currentBuild.result = 'ABORTED'
+            error "TfSec Unstable"
+          }
+          failure {
+            currentBuild.result = 'ABORTED'
+            error "Tfsec failed"
+          }
         }
       }
+    } catch (e) {
+      currentBuild.result = 'ABORTED'
+      echo('Aborted Pipeline')
+      return
     }
     stage('terraform') {
       steps {
