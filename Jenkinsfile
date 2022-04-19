@@ -33,9 +33,8 @@ pipeline {
         }
       }
       steps {
-        sh 'ls .'
         sh '''
-          tfsec . --no-color
+          docker run --rm -it -v "$(pwd):/src" aquasec/tfsec ./ --no-color
         '''
       }
     }
