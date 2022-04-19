@@ -56,21 +56,21 @@ pipeline {
         script{ 
           sh 'chmod 755 ./tfsecw.sh'
           sh './tfsecw.sh'
-          
-        }
-      }
-      post {
-        always { 
-          echo "=========always========="
           junit skipPublishingChecks: true, testResults: 'tfsec_results.xml'
         }
-        // success {
-        //   echo "Tfsec passed"
-        // }
-        // failure {
-        //   echo "Tfsec failed"
-        // }
       }
+      // post {
+      //   always { 
+      //     echo "=========always========="
+      //     junit skipPublishingChecks: true, testResults: 'tfsec_results.xml'
+      //   }
+      //   // success {
+      //   //   echo "Tfsec passed"
+      //   // }
+      //   // failure {
+      //   //   echo "Tfsec failed"
+      //   // }
+      // }
     }
     // stage('terraform') {
     //   steps {
