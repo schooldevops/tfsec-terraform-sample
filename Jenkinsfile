@@ -56,12 +56,13 @@ pipeline {
           sh 'chmod 755 ./tfsecw.sh'
           sh 'cat main.tf'
           sh './tfsecw.sh'
+          sh 'cat tfsec_result.xml'
         }
       }
       post {
         always { 
           echo "=========always========="
-          junit checksName: 'Terraform security checks', testResults: "tfsec_reslt.xml"
+          junit checksName: 'Terraform security checks', testResults: "tfsec_result.xml"
         }
         success {
           echo "Tfsec passed"
