@@ -42,19 +42,21 @@ pipeline {
         }
         unstable {
           echo "TfSec Unstable"
+          exit 1
         }
         failure {
           echo "Tfsec failed"
+          exit 1
         }
       }
     }
-    // stage('terraform') {
-    //   steps {
-    //     sh 'ls .'
-    //     sh 'chmod 755 ./terraformw'
-    //     sh './terraformw apply -auto-approve -no-color'
-    //   }
-    // }
+    stage('terraform') {
+      steps {
+        sh 'ls .'
+        sh 'chmod 755 ./terraformw'
+        sh './terraformw apply -auto-approve -no-color'
+      }
+    }
   }
   post {
     always {
