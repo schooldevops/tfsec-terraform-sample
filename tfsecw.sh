@@ -12,8 +12,11 @@ echo "$(pwd)"
 # docker run --rm -v "$(pwd):/src" aquasec/tfsec /src -f junit > tfsec_results.xml
 # docker run --rm -v $(pwd)/:/src aquasec/tfsec /src --no-color
 
-culr -fsSLO https://github.com/aquasecurity/tfsec/releases/download/v1.18.0/tfsec_1.18.0_linux_arm64.tar.gz
+curl -fsSLO https://github.com/aquasecurity/tfsec/releases/download/v1.18.0/tfsec_1.18.0_linux_arm64.tar.gz
+
 tar xzvf tfsec_1.18.0_linux_arm64
+
+ls -alt . 
 
 chmod 755 ./tfsec_1.18.0_linux_arm64/bin/tfsec
 
