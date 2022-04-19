@@ -32,7 +32,7 @@ pipeline {
         sh './tfsecw.sh'
       }
 
-      post {
+      step {
         always { 
           echo "========= Check tfsec test results ========="
           junit allowEmptyResults: true, testResults: 'tfsec_results.xml', skipPublishingChecks: true
@@ -41,12 +41,10 @@ pipeline {
           echo "Tfsec passed"
         }
         unstable {
-          echo "TfSec Unstable"
-          exit 1
+          error "TfSec Unstable"
         }
         failure {
-          echo "Tfsec failed"
-          exit 1
+          error "Tfsec failed"
         }
       }
     }
