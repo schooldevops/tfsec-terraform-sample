@@ -1,231 +1,337 @@
-<p align="center">
-  <img width="354" src="./tfsec.png">
-</p>
+# Terraform + tfsec + Jenkins 배포 자동화 
 
-[![GoReportCard](https://goreportcard.com/badge/github.com/aquasecurity/tfsec)](https://goreportcard.com/report/github.com/aquasecurity/tfsec)
-[![Join Our Slack](https://img.shields.io/badge/Slack-Join-green)](https://slack.aquasec.com/)
-[![Docker Build](https://img.shields.io/docker/v/tfsec/tfsec?label=docker)](https://hub.docker.com/r/tfsec/tfsec)
-[![Homebrew](https://img.shields.io/badge/dynamic/json.svg?url=https://formulae.brew.sh/api/formula/tfsec.json&query=$.versions.stable&label=homebrew)](https://formulae.brew.sh/formula/tfsec)
-[![Chocolatey](https://img.shields.io/chocolatey/v/tfsec)](https://chocolatey.org/packages/tfsec)
-[![AUR version](https://img.shields.io/aur/version/tfsec)](https://aur.archlinux.org/packages/tfsec)
-[![VScode Extension](https://img.shields.io/visual-studio-marketplace/v/tfsec.tfsec?label=vscode)](https://marketplace.visualstudio.com/items?itemName=tfsec.tfsec)
+- Terraform 은 Hashicorp 에서 개발하고, 오픈소스화한 프로비져닝 툴이다. 
+- 다양한 Cloud Provider 리소스 프로비저닝을 제공하며, OnPreme에서도 프로비져닝을 활용할 수 있는 다양한 방법을 제공하고 있다. 
+- 프로비저닝의 경우 잠재적인 보안 이슈를 가지고 있으며 이를 검사하고, 보안상 안정적이지 않은 경우 배포를 중지할 필요가 있다. 
+- 이때 사용할 수 있는 것이 tfsec라는 도구이다. 
+- 여기서는 tfsec으로 테라폼 코드를 확인하고, terraform으로 프로비져닝 단계를 Jenkins Pipeline으로 구성할 것이다. 
 
-tfsec uses static analysis of your terraform code to spot potential misconfigurations.
+## Jenkins 설치하기 
 
-## Features
+- Jenkins 의 경우 Docker를 이용하여 설치할 것이다. 
 
-- :cloud: Checks for misconfigurations across all major (and some minor) cloud providers
-- :no_entry: Hundreds of built-in rules
-- :nesting_dolls: Scans modules (local and remote)
-- :heavy_plus_sign: Evaluates HCL expressions as well as literal values
-- :arrow_right_hook: Evaluates Terraform functions e.g. `concat()`
-- :link: Evaluates relationships between Terraform resources
-- :toolbox: Compatible with the Terraform CDK
-- :no_good: Applies (and embellishes) user-defined Rego policies
-- :page_with_curl: Supports multiple output formats: CLI, JSON, SARIF, CSV, CheckStyle, and JUnit.
-- :hammer_and_wrench: Configurable (via CLI flags and/or config file)
-- :zap: Very fast, capable of quickly scanning huge repositories
-- :electric_plug: Plugins for popular IDEs available ([JetBrains](https://plugins.jetbrains.com/plugin/18687-tfsec-findings-explorer), [VSCode](https://marketplace.visualstudio.com/items?itemName=tfsec.tfsec) and [Vim](https://github.com/aquasecurity/vim-tfsec)) 
-- :house_with_garden: Community-driven - come and chat with us [on Slack](https://slack.aquasec.com/)!
+### 사전 준비사항 
 
-## Recommended by Thoughtworks
+- 우선 Docker가 호스트에 설치가 되어 있어야한다. 
+- Jenkins 컨테이너에서 Docker가 수행되어야 하기 때문에 host의 Docker를 이용하도록 볼륨 마운트가 필요하다. 
 
-Rated _Adopt_ by the [Thoughtworks Tech Radar](https://www.thoughtworks.com/en-gb/radar/tools/tfsec):
+- 필요한 볼륨은 다음과 같이 연결된다. 
+  - host: /var/run/docker.sock
+  - Jenkins Contianer: /var/run/docker.sock
 
-> For our projects using Terraform, tfsec has quickly become a default static analysis tool to detect potential security risks. It's easy to integrate into a CI pipeline and has a growing library of checks against all of the major cloud providers and platforms like Kubernetes. Given its ease of use, we believe tfsec could be a good addition to any Terraform project.
+### Jenkins 컨테이너 실행하기
 
-## Example Output
-
-![Example screenshot](screenshot.png)
-
-## Installation
-
-Install with [brew/linuxbrew](https://brew.sh)
-
-```bash
-brew install tfsec
+- 이제 Jenkins를 띄워보자. 
+  
+```py
+sudo docker run -d --name myjenkins \
+  -v `pwd`/data:/var/jenkins_home \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -p 8080:8080 -p 50000:50000 \
+  jenkins/jenkins
 ```
 
-Install with [Chocolatey](https://chocolatey.org/)
+- sudo docker run: docker 컨테이너를 실행한다. 이때 sudo 로 어드민 권한으로 실행한다. 
+- '-d': 백그라운드로 컨테이너를 실행한다. 
+- '--name myjenkins': 컨테이너 인스턴스 이름을 지정한다. 
+- '-v `pwd`/data:/var/jenkins_home': 현재 실행하는 host의 위치에 data 디렉토리와 Jenkins 내부에 /var/jenkins_home 볼륨을 연결한다. 
+- '-v /var/run/docker.sock:/var/run/docker.sock': docker.sock 을 컨테이너에서 host의 파일을 이용할 수 있도록 볼륨 마운트를 한다. 
+- '-p 8080:8080 -p 50000:50000': jenkins 포트를 연결한다. 8080으로 화면에 접근한다. 50000은 내부에서 사용한다. 
+- 'jenkins/jenkins': 최신 jenkins 컨테이너 이미지를 지정한다. 
 
-```cmd
-choco install tfsec
+### Jenkins 내부에 docker 실행하기. 
+
+- 아래 명령어로 컨테이너 내부에 root 게정으로 접근한다. 
+
+```go
+docker exec -it --user root <container_id> /bin/bash
 ```
 
-Install with [Scoop](https://scoop.sh/)
+- 아래 명령어로 docker를 설치한다. 
 
-```cmd
-scoop install tfsec
+```go
+$ curl -fsSL https://get.docker.com | sh
 ```
 
-You can also grab the binary for your system from the [releases page](https://github.com/aquasecurity/tfsec/releases).
+- '-fsSL' 을 이용하면 curl을 이용하여 바이너리 파일을 다운로드 할 수 있다. 
+- 'sh' 명령을 파이프하여 다운받은 설치 파일을 바로 설치한다. 
 
-Alternatively, install with Go:
-
-```bash
-go install github.com/aquasecurity/tfsec/cmd/tfsec@latest
+```go
+$ docker ps
 ```
 
-Please note that using `go install` will install directly from the `master` branch and version numbers will not be reported via `tfsec --version`.
+- 위 결과가 정상으로 수행되면 다음 단계로 넘어갈 준비가 된 것이다. 
 
-### Signing
+## Jenkins Console 구성하기. 
 
-The binaries on the [releases page](https://github.com/aquasecurity/tfsec/releases) are signed with the tfsec signing key `D66B222A3EA4C25D5D1A097FC34ACEFB46EC39CE` 
+- 이제 Jenkins Console에 접근하여 초기화를 마무리하자. 
 
-Form more information check the [signing page](SIGNING.md) for instructions on verification.
+![jenkins_01](imgs/jenkins_01.png)
 
-## Usage
+- 위와 같이 암호를 입력하기 위해서는 다음 커맨드로 암호를 찾을 수 있다. 
 
-tfsec will scan the specified directory. If no directory is specified, the current working directory will be used.
+```py
+$ docker exec -it myjenkins bash -c 'cat /var/jenkins_home/secrets/initialAdminPassword'
 
-The exit status will be non-zero if tfsec finds problems, otherwise the exit status will be zero.
+628c3420232348aaad5d11e643516712
+```
+###  이후 초기화 하기 
 
-```bash
-tfsec .
+- [다음](https://schooldevops.tistory.com/59) 참조하여 이후 작업을 진행하자. 
+- ***참고*** 작업의 단순화를 위해서 Master/Slave로 구성할 필요는 없다, 단순히 Master만 설치해도 된다.
+### Docker 플러그인 구성하기
+
+- Jenkins내부에 Docker플러그인을 구성하자. 
+- Dashboard > Jenkins 관리 를 선택한다. 
+    
+![jenkins_02](imgs/jenkins_02.png)
+
+- 플러그인 관리 를 선택한다. 
+  
+![jenkins_03](imgs/jenkins_03.png)
+
+- Plugiin Manager > 설치가능 탭을 클릭한다. 
+- 그리고 검색 창에 Docker를 클릭한다. 
+  
+![jenkins_04](imgs/jenkins_04.png)
+
+- Docker Commons, Docker Pipeline, Docker 를 선택하고, 설치한다. 
+- 설치후에 Jenkins를 재시작 하도록 한다. 
+  
+### Global Tool 설정하기 
+
+- Global Tool에서 Docker 를 설정할 것이다. 
+- Jenkins 관리 에서 Global Tool Configuration 을 선택한다. 
+  
+![jenkins_05](imgs/jenkins_05.png)
+
+- 아래와 같이 Docker 부분을 찾고 "Add Docker" 를 클릭한다. 
+- 아래 그림과 같이 입력한다. 
+  
+![jenkins_06](imgs/jenkins_06.png)
+
+- Docker Name: myDocker
+- Install automatically 를 체크한다. 
+- Download from docker.com 항목을 선택한다. 
+- Docker version: latest 로 선택한다. 
+  
+### Node 관리로 실행할 노드 지정하기. 
+
+- 이 부분은 Jenkins Job이 실행될때 실행될 노드를 선택하는 부분이다. 
+- 우리는 노드를 지정하는 Jenkinsfile 을 이용하므로 아래와 같이 노드를 선택해주자. 
+- 우선 Jenkins 관리 > 노드 관리 를 선택한다. 
+  
+![jenkins_07](imgs/jenkins_07.png)
+
+- Manage nodes and clouds 에서 노드 이름에 있는 Combobox를 누르고 > 설정을 클릭한다. 
+  
+![jenkins_08](imgs/jenkins_08.png)
+
+- 아래와 같이 라벨을 'linux'로 입력하고 저장한다. 
+  
+![jenkins_09](imgs/jenkins_09.png)
+
+## 파이프라인 구상하기
+
+- 우리가 수행할 파이프라인은 다음 절차대로 수행된다.
+  - 1. 태스크를 수행할 대상 노드 선택하기
+  - 2. 작업 디렉토리 초기화하기 
+  - 3. git에서 소스 체크아웃 받기 
+  - 4. tfsec 를 통해 terraform 검사하기 
+  - 5. terraform 을 실행하여 프로비저닝하기 
+  - 6. 작업 삭제하기 
+
+- 위 과정에서 중요한 것은 과정을 진행하면서 오류가 발생하면, 더이상 작업을 진행하지 않도록 하는데 있다. 
+- 특히 tfsec, terraform 에서 작업 오류인경우 작업을 멈춘다. 
+## tfsecw.sh 파일 작성하기. 
+
+- 이제 우리는 tfsec을 이용하여 terraform 을 정적 분석 할 것이다. 
+- 이때 docker커맨드를 이용하여 현재 체크아웃 받은 디렉토리를 검사하게 된다. 
+
+- tfsecw.sh 파일을 생성하고 다음과 같이 작성하자. 
+
+```py
+#!/bin/bash 
+
+echo "---------------------- Check directory"
+
+ls ./
+
+echo "----------------------- Run tfsec with docker"
+
+docker run --rm -v "$(pwd):/src" aquasec/tfsec /src --no-color
+
 ```
 
-## Use with Docker
+- 보는바와 같이 단순 shell파일이다. 
+- docker run 을 통해서 tfsec 을 실행한다. 공식적인 tfsec 이미지는 aquasec/tfsec 이다. 
+- '--rm' 컨테이너가 실행되고 바로 삭제 되도록 하였다. 
+- '-v "$(pwd):/src"' 현재 실행되는 디렉토리내 파일과 컨테이너 내부의 /src 디렉토리를 연결한다. (즉, git에서 체크아웃 받은 소스 파일이 현재 파일에 놓이게 된다.)
+- 'aquasec/tfsec' tfsec의 공식 이미지이다. 
+- '/src' 검사할 대상 디렉토리이다. 컨테이너 내부의 디렉토리를 말한다. 
+- '--no-color' jenkins에서 처리결과를 단순 텍스트로 나타내기 위해서는 --no-color 옵션을 주면된다. 이렇게 하면 jenkins 처리 결과를 깔끔하게 복사할 수 있게 된다. 
 
-As an alternative to installing and running tfsec on your system, you may run tfsec in a Docker container.
+## terraformw 파일 작성하기 
 
-There are a number of Docker options available
+- terraformw는 tfswitch 를 이용하여 최신 테라폼을 설치하고, 이를 이용하여 terraform 을 실행하도록 해준다. 
+- 미리 jenkins에 terraform 바이너리를 설치하지 않아도 되므로 다양한 환경에서 실행이 가능한 장점이 있다. 
 
-| Image Name | Base | Comment |
-|------------|------|---------|
-|[aquasec/tfsec](https://hub.docker.com/r/aquasec/tfsec)|alpine|Normal tfsec image|
-|[aquasec/tfsec-alpine](https://hub.docker.com/r/aquasec/tfsec-alpine)|alpine|Exactly the same as aquasec/tfsec, but for those whole like to be explicit|
-|[aquasec/tfsec-ci](https://hub.docker.com/r/aquasec/tfsec-ci)|alpine|tfsec with no entrypoint - useful for CI builds where you want to override the command|
-|[aquasec/tfsec-scratch](https://hub.docker.com/r/aquasec/tfsec-scratch)|scratch|An image built on scratch - nothing frilly, just runs tfsec|
+```py
+#!/bin/bash 
 
-To run:
+echo "--------------------- Installing tfswitch locally for running terraform"
 
-```bash
-docker run --rm -it -v "$(pwd):/src" aquasec/tfsec /src
+# Download terraform-switcher install file 
+curl -O  https://raw.githubusercontent.com/warrensbox/terraform-switcher/release/install.sh
+
+# 실행 가능하도록 설정 변경
+chmod 755 install.sh
+
+# tfswitch 를 설치한다. 
+./install.sh -b $(pwd)/.bin
+
+# 설치 PATH를 환경변수에 저징한다. 
+CUSTOMBIN=$(pwd)/.bin
+
+# 환경 변수 PATH에 싫애 파일을 설정한다. 
+export PATH=$CUSTOMBIN:$PATH
+
+$CUSTOMBIN/tfswitch -b $CUSTOMBIN/terraform
+
+terraform $*
 ```
 
-## Use with Visual Studio Code
+- curl 을 이용하여 terraform switcher 를 다운로드 받는다. 
+- 다운로드 받은 쉘스크립트를 실행하고 환경변수에 등록한다. 
+- '$CUSTOMBIN/tfswitch -b $CUSTOMBIN/terraform' 을 이용하여 terraform을 수행할 준비를 한다. 
+- 'terraform $*' 으로 전달된 파라미터와 함께 terraform 을 실행한다. 
+- terraformw 는 terraform에 전달되는 파라미터에 따라 다양한 처리를 할 수 있다. 
+  - 예를 들어 terraform plan 을 수행하거나, terraform apply, terraform destroy 등을 수행할 수 있게 된다. 
 
-A Visual Studio Code extension is being developed to integrate with tfsec results. More information can be found on the [tfsec Marketplace page](https://marketplace.visualstudio.com/items?itemName=tfsec.tfsec)
+## Jenkinsfile 으로 파이프라인 작성하기. 
 
-## Use as GitHub Action
+- 이제는 Jenkinsfile 을 작성하여 파이프라인을 구성할 것이다. 
+- 순서는 이전에 설명한것과 같으며 Jenkinsfile 을 생성하고, 아래와 같이 입력한다. 
 
-If you want to run tfsec on your repository as a GitHub Action, you can use [https://github.com/aquasecurity/tfsec-pr-commenter-action](https://github.com/aquasecurity/tfsec-pr-commenter-action).
+```py
 
-## Ignoring Warnings
-
-You may wish to ignore some warnings. If you'd like to do so, you can
-simply add a comment containing `tfsec:ignore:<rule>` to the offending
-line in your templates. Alternatively, you can add the comment to the line above the block containing the issue, or to the module block to ignore all occurrences of an issue inside the module.
-
-For example, to ignore an open security group rule:
-
-```terraform
-resource "aws_security_group_rule" "my-rule" {
-    type = "ingress"
-    cidr_blocks = ["0.0.0.0/0"] #tfsec:ignore:aws-vpc-no-public-ingress-sgr
+pipeline {
+  agent { label 'linux'}
+  environment {
+    def dockerHome = tool 'myDocker'
+    PATH = "${dockerHome}/bin:${env.PATH}"
+  }
+  options {
+    skipDefaultCheckout(true)
+  }
+  stages{
+    stage('clean workspace') {
+      steps {
+        cleanWs()
+      }
+    }
+    stage('Initialize') {
+      steps {
+        echo "env ${env.PATH}"
+      }
+    }
+    stage('checkout') {
+      steps {
+        checkout scm
+      }
+    }
+    stage('tfsec') {
+      steps {
+        sh 'chmod 755 ./tfsecw.sh'
+        sh './tfsecw.sh'
+      }
+    }
+    stage('terraform') {
+      steps {
+        sh 'ls .'
+        sh 'chmod 755 ./terraformw'
+        sh './terraformw apply -auto-approve -no-color'
+      }
+    }
+  }
+  post {
+    always {
+      cleanWs()
+    }
+  }
 }
 ```
 
-...or...
+- agent: 파이프라인이 실행될 agent 를 지정한다. 이전에 Jenkins설정에서 우리는 linux라는 이름의 노드를 설정했었다. 
+- environment: 파이프라인에서 사용할 환경변수를 지정한다. 
+- stages: Jenkins의 각 단계를 정의한다. 
+- stage: stages 하위에 개별 단계를 정의한다. 
+- steps: stage내부에 처리될 명령들을 기술한다. 
 
-```terraform
-resource "aws_security_group_rule" "my-rule" {
-    type = "ingress"
-    #tfsec:ignore:aws-vpc-no-public-ingress-sgr
-    cidr_blocks = ["0.0.0.0/0"]
+```py
+    stage('checkout') {
+      steps {
+        checkout scm
+      }
+    }
+```
+
+- 위 스테이지는 github에서 체크아웃을 받는 역할을 한다. 
+
+```py
+    stage('tfsec') {
+      steps {
+        sh 'chmod 755 ./tfsecw.sh'
+        sh './tfsecw.sh'
+      }
+    }
+```
+
+- 체크아웃 받은 소스에서 tfsecw.sh 파일의 실행 권한을 변경하고, sh 명령으로 쉘스크립트를 실행한다. 
+
+```py
+    stage('terraform') {
+      steps {
+        sh 'ls .'
+        sh 'chmod 755 ./terraformw'
+        sh './terraformw apply -auto-approve -no-color'
+      }
+    }
+```
+
+- terraformw 를 실행한다. 이때 전달되는 파라미터는 apply -auto-approve -no-color이다. 
+  - 'apply': terraform 으로 프로비져닝을 실제 수행한다. 
+  - '-auto-approve': 프로비저닝 수행시 수행여부를 자동으로 승인처리한다. 
+  - '-no-color': 처리결과를 Jenkins에서 노출할때 일반 텍스트로 노출되도록 지정한다. 결과를 다른 에디터에 단순 복사/붙여넣기에 할 수 있다. 
+
+## Terraform sample 작성하기 
+
+- 이제 terraform 을 작성해보자. 
+- main.tf 파일을 생성하고 다음과 같이 추가한다. 
+
+```py
+resource "aws_elasticache_replication_group" "bad_example" {
+         replication_group_id = "foo"
+         replication_group_description = "my foo cluster"
+         transit_encryption_enabled = false
+}
+
+/*
+resource "aws_elasticache_replication_group" "good_example" {
+         replication_group_id = "foo"
+         replication_group_description = "my foo cluster"
+
+         at_rest_encryption_enabled = true
+         transit_encryption_enabled = true
+
+ }
+*/
+
+output "jenkins_terraform" {
+  value = "running Terraform from Jenkins"
 }
 ```
 
-If you're not sure which line to add the comment on, just check the
-tfsec output for the line number of the discovered problem.
+- 우선 'bad_example' 을 먼저 작성하고 good_example은 주석처리해 둔다. 
+- 그리고 github에 커밋하자. 
 
-You can ignore multiple rules by concatenating the rules on a single line:
-
-```terraform
-#tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-enable-bucket-logging
-resource "aws_s3_bucket" "my-bucket" {
-  bucket = "foobar"
-  acl    = "private"
-}
-```
-
-### Expiration Date
-You can set expiration date for `ignore` with `yyyy-mm-dd` format. This is a useful feature when you want to ensure ignored issue won't be forgotten and should be revisited in the future.
-```
-#tfsec:ignore:aws-s3-enable-bucket-encryption:exp:2025-01-02
-```
-Ignore like this will be active only till `2025-01-02`, after this date it will be deactivated.
-
-## Disable checks
-
-You may wish to exclude some checks from running. If you'd like to do so, you can
-simply add new argument `-e check1,check2,etc` to your cmd command
-
-```bash
-tfsec . -e general-secrets-sensitive-in-variable,google-compute-disk-encryption-customer-keys
-```
-
-## Including values from .tfvars
-
-You can include values from a tfvars file in the scan,  using, for example: `--tfvars-file terraform.tfvars`.
-
-## Included Checks
-
-tfsec supports many popular cloud and platform providers
-
-| Checks                                                                                  |
-|:----------------------------------------------------------------------------------------|
-| [AWS Checks](https://aquasecurity.github.io/tfsec/latest/checks/aws/)                   |
-| [Azure Checks](https://aquasecurity.github.io/tfsec/latest/checks/azure/)               |
-| [GCP Checks](https://aquasecurity.github.io/tfsec/latest/checks/google/)                |
-| [CloudStack Checks](https://aquasecurity.github.io/tfsec/latest/checks/cloudstack/)     |
-| [DigitalOcean Checks](https://aquasecurity.github.io/tfsec/latest/checks/digitalocean/) |
-| [GitHub Checks](https://aquasecurity.github.io/tfsec/latest/checks/github/)             |
-| [Kubernetes Checks](https://aquasecurity.github.io/tfsec/latest/checks/kubernetes/)     |
-| [OpenStack Checks](https://aquasecurity.github.io/tfsec/latest/checks/openstack/)       |
-| [Oracle Checks](https://aquasecurity.github.io/tfsec/latest/checks/oracle/)             |
-
-## Running in CI
-
-tfsec is designed for running in a CI pipeline. You may wish to run tfsec as part of your build without coloured
-output. You can do this using `--no-colour` (or `--no-color` for our American friends).
-
-## Output options
-
-You can output tfsec results as JSON, CSV, Checkstyle, Sarif, JUnit or just plain old human-readable format. Use the `--format` flag
-to specify your desired format.
-
-## GitHub Security Alerts
-If you want to integrate with Github Security alerts and include the output of your tfsec checks you can use the [tfsec-sarif-action](https://github.com/marketplace/actions/run-tfsec-with-sarif-upload) Github action to run the static analysis then upload the results to the security alerts tab.
-
-The alerts generated for [tfsec-example-project](https://github.com/tfsec/tfsec-example-project) look like this.
-
-![github security alerts](codescanning.png)
-
-When you click through the alerts for the branch, you get more information about the actual issue. 
-
-![github security alerts](scanningalert.png)
-
-For more information about adding security alerts, check 
-
-## Support for older terraform versions
-
-If you need to support versions of terraform which use HCL v1
-(terraform <0.12), you can use `v0.1.3` of tfsec, though support is
-very limited and has fewer checks.
-
-## Contributing
-
-We always welcome contributions; big or small, it can be documentation updates, adding new checks or something bigger. Please check the [Contributing Guide](CONTRIBUTING.md) for details on how to help out.
-
-### Some People who have contributed
-
-<a href = "https://github.com/aquasecurity/tfsec/graphs/contributors">
-  <img src = "https://contrib.rocks/image?repo=aquasecurity/tfsec"/>
-</a>
-
-Made with [contributors-img](https://contrib.rocks).
-
-`tfsec` is an [Aqua Security](https://aquasec.com) open source project.
-Learn about our open source work and portfolio [here](https://www.aquasec.com/products/open-source-projects/).
-Join the community, and talk to us about any matter in [GitHub Discussion](https://github.com/aquasecurity/tfsec/discussions) or [Slack](https://slack.aquasec.com).

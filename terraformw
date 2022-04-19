@@ -1,23 +1,22 @@
 #!/bin/bash 
 
-# echo "Installing tfswitch locally"
+echo "--------------------- Installing tfswitch locally for running terraform"
 
-# # Get the installer on to your machine
-# # wget -N -c https://raw.githubusercontent.com/warrensbox/terraform-switcher/release/install.sh
-# curl -O  https://raw.githubusercontent.com/warrensbox/terraform-switcher/release/install.sh
+# Download terraform-switcher install file 
+curl -O  https://raw.githubusercontent.com/warrensbox/terraform-switcher/release/install.sh
 
-# # Make installer executable
-# chmod 755 install.sh
+# 실행 가능하도록 설정 변경
+chmod 755 install.sh
 
-# # Install tfswitch in a location you have permission
-# ./install.sh -b $(pwd)/.bin
+# tfswitch 를 설치한다. 
+./install.sh -b $(pwd)/.bin
 
-# # set custom bin path
-# CUSTOMBIN=$(pwd)/.bin
+# 설치 PATH를 환경변수에 저징한다. 
+CUSTOMBIN=$(pwd)/.bin
 
-# #Add custom bin path to PATH environment
-# export PATH=$CUSTOMBIN:$PATH
+# 환경 변수 PATH에 싫애 파일을 설정한다. 
+export PATH=$CUSTOMBIN:$PATH
 
-# $CUSTOMBIN/tfswitch -b $CUSTOMBIN/terraform
+$CUSTOMBIN/tfswitch -b $CUSTOMBIN/terraform
 
-# terraform $*
+terraform $*
