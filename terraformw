@@ -1,14 +1,5 @@
 #!/bin/bash 
 
-echo "Check terraform with tfsec"
-
-# wget https://github.com/aquasecurity/tfsec/releases/download/v1.18.0/tfsec_1.18.0_linux_arm64.tar.gz
-# tar zxvf tfsec_1.18.0_linux_arm64.tar.gz
-
-# ls ./
-
-# ./tfsec ./ --no-color
-
 # echo "Installing tfswitch locally"
 
 # # Get the installer on to your machine

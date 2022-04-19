@@ -26,16 +26,20 @@ pipeline {
     }
     
     stage('tfsec') {
-      agent { 
-        docker { 
-          image 'aquasec/tfsec-ci'
-          reuseNode true
-        }
-      }
+      // agent { 
+      //   docker { 
+      //     image 'aquasec/tfsec-ci'
+      //     reuseNode true
+      //   }
+      // }
+      // steps {
+      //   sh '''
+      //     docker run --rm -it -v "$(pwd):/src" aquasec/tfsec ./ --no-color
+      //   '''
+      // }
       steps {
-        sh '''
-          docker run --rm -it -v "$(pwd):/src" aquasec/tfsec ./ --no-color
-        '''
+        sh 'chmod 755 ./tfsecw'
+        sh './tfsecw'
       }
     }
     // stage('terraform') {
