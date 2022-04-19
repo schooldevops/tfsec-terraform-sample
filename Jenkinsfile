@@ -38,16 +38,15 @@ pipeline {
           junit allowEmptyResults: true, testResults: 'tfsec_results.xml'
         }
         success {
-          echo "Tfsec passed"
-          
+          echo "Tfsec passed" 
         }
         unstable {
+          currentBuild.result = 'ABORTED'
           error "TfSec Unstable"
-          return
         }
         failure {
+          currentBuild.result = 'ABORTED'
           error "Tfsec failed"
-          return
         }
       }
     }
