@@ -41,7 +41,7 @@ pipeline {
         sh './terraformw apply -auto-approve -no-color'
       }
     }
-    post('check') {
+    post {
       always { 
         echo "========= Check tfsec test results ========="
         junit allowEmptyResults: true, testResults: 'tfsec_results.xml', skipPublishingChecks: true
