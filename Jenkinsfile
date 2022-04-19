@@ -25,6 +25,7 @@ pipeline {
       }
     }
     stage('tfsec') {
+      failFast true
       steps {
         echo "=========== Execute tfsec ================="
         // sh 'docker run --rm -i -v "$(pwd):/src" aquasec/tfsec /src --no-color'
@@ -51,6 +52,7 @@ pipeline {
       }
     }
     stage('terraform') {
+      failFast true
       steps {
         sh 'ls .'
         sh 'chmod 755 ./terraformw'
