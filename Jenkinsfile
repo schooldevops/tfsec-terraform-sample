@@ -33,7 +33,7 @@ pipeline {
       }
     }
     stage('check') {
-      always { 
+      steps { 
         echo "========= Check tfsec test results ========="
         junit allowEmptyResults: true, testResults: 'tfsec_results.xml', skipPublishingChecks: true
       }
