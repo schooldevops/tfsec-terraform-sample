@@ -30,8 +30,23 @@ pipeline {
         // sh 'docker run --rm -i -v "$(pwd):/src" aquasec/tfsec /src --no-color'
         sh 'chmod 755 ./tfsecw.sh'
         sh './tfsecw.sh'
-        junit allowEmptyResults: true, testResults: 'tfsec_results.xml', skipPublishingChecks: true
+      }
 
+      post {
+        always { 
+          echo "========= Check tfsec test results ========="
+          junit allowEmptyResults: true, testResults: 'tfsec_results.xml', skipPublishingChecks: true
+        }
+        success {
+          echo "Tfsec passed"
+        }
+        unstable {
+          error "TfSec Unstable"
+          
+        }
+        failure {
+          error "Tfsec failed"
+        }
       }
     }
     stage('terraform') {
@@ -41,21 +56,6 @@ pipeline {
         sh './terraformw apply -auto-approve -no-color'
       }
     }
-    // post {
-    //   always { 
-    //     echo "========= Check tfsec test results ========="
-    //     junit allowEmptyResults: true, testResults: 'tfsec_results.xml', skipPublishingChecks: true
-    //   }
-    //   success {
-    //     echo "Tfsec passed"
-    //   }
-    //   unstable {
-    //     error "TfSec Unstable"
-    //   }
-    //   failure {
-    //     error "Tfsec failed"
-    //   }
-    // }
   }
   post {
     always {
