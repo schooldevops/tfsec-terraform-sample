@@ -61,7 +61,7 @@ pipeline {
       post {
         always { 
           echo "=========always========="
-          junit skipPublishingChecks: true, testResults: 'tfsec_results.xml'
+          junit 'tfsec_results.xml'
         }
         success {
           echo "Tfsec passed"
