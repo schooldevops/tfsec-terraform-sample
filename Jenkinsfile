@@ -31,21 +31,20 @@ pipeline {
         sh 'chmod 755 ./tfsecw.sh'
         sh './tfsecw.sh'
       }
-
-      steps {
-        always { 
-          echo "========= Check tfsec test results ========="
-          junit allowEmptyResults: true, testResults: 'tfsec_results.xml', skipPublishingChecks: true
-        }
-        success {
-          echo "Tfsec passed"
-        }
-        unstable {
-          error "TfSec Unstable"
-        }
-        failure {
-          error "Tfsec failed"
-        }
+    }
+    stage('check') {
+      always { 
+        echo "========= Check tfsec test results ========="
+        junit allowEmptyResults: true, testResults: 'tfsec_results.xml', skipPublishingChecks: true
+      }
+      success {
+        echo "Tfsec passed"
+      }
+      unstable {
+        error "TfSec Unstable"
+      }
+      failure {
+        error "Tfsec failed"
       }
     }
     stage('terraform') {
