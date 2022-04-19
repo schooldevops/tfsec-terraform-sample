@@ -32,7 +32,7 @@ pipeline {
         sh './tfsecw.sh'
       }
 
-      step {
+      steps {
         always { 
           echo "========= Check tfsec test results ========="
           junit allowEmptyResults: true, testResults: 'tfsec_results.xml', skipPublishingChecks: true
