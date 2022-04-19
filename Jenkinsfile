@@ -27,7 +27,7 @@ pipeline {
     stage('tfsec') {
       steps {
         echo "=========== Execute tfsec ================="
-        sh 'docker run --rm -i -v "$(pwd):/src" aquasec/tfsec /src'
+        sh 'docker run --rm -i -v "$(pwd):/src" aquasec/tfsec /src --no-color'
 
         // sh 'chmod 755 ./tfsecw.sh'
         // sh './tfsecw.sh'
