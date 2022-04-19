@@ -38,8 +38,8 @@ pipeline {
       //   '''
       // }
       steps {
-        sh 'chmod 755 ./tfsecw'
-        sh './tfsecw'
+        sh 'chmod 755 ./tfsecw.sh'
+        sh './tfsecw.sh'
       }
     }
     // stage('terraform') {
