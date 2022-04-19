@@ -36,18 +36,16 @@ pipeline {
       post {
         always { 
           echo "========= Check tfsec test results ========="
-          junit allowEmptyResults: true, testResults: 'tfsec_results.xml'
+          junit allowEmptyResults: true, testResults: 'tfsec_results.xml', skipPublishingChecks: true
         }
         success {
           echo "Tfsec passed" 
         }
         unstable {
           error "TfSec Unstable"
-          // throw Exception('Unstable')
         }
         failure {
           error "Tfsec failed"
-          // throw Exception('Unstable')
         }
       }
     }
