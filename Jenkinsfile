@@ -1,30 +1,30 @@
 
 pipeline {
-  agent { label 'linux'}
-  environment {
-    def dockerHome = tool 'myDocker'
-    PATH = "${dockerHome}/bin:${env.PATH}"
-  }
-  options {
-    skipDefaultCheckout(true)
-  }
-  stages{
-    stage('clean workspace') {
-      steps {
-        cleanWs()
-      }
+  try {
+    agent { label 'linux'}
+    environment {
+      def dockerHome = tool 'myDocker'
+      PATH = "${dockerHome}/bin:${env.PATH}"
     }
-    stage('Initialize') {
-      steps {
-        echo "env ${env.PATH}"
-      }
+    options {
+      skipDefaultCheckout(true)
     }
-    stage('checkout') {
-      steps {
-        checkout scm
+    stages{
+      stage('clean workspace') {
+        steps {
+          cleanWs()
+        }
       }
-    }
-    try {
+      stage('Initialize') {
+        steps {
+          echo "env ${env.PATH}"
+        }
+      }
+      stage('checkout') {
+        steps {
+          checkout scm
+        }
+      }
       stage('tfsec') {
         steps {
           echo "=========== Execute tfsec ================="
@@ -51,22 +51,22 @@ pipeline {
           }
         }
       }
-    } catch (e) {
-      currentBuild.result = 'ABORTED'
-      echo('Aborted Pipeline')
-      return
-    }
-    stage('terraform') {
-      steps {
-        sh 'ls .'
-        sh 'chmod 755 ./terraformw'
-        sh './terraformw apply -auto-approve -no-color'
+      stage('terraform') {
+        steps {
+          sh 'ls .'
+          sh 'chmod 755 ./terraformw'
+          sh './terraformw apply -auto-approve -no-color'
+        }
       }
     }
-  }
-  post {
-    always {
-      cleanWs()
+    post {
+      always {
+        cleanWs()
+      }
     }
-  }
+  } catch (e) {
+  currentBuild.result = 'ABORTED'
+  echo('Aborted Pipeline')
+  return
+}
 }
