@@ -52,24 +52,24 @@ pipeline {
     
     stage('tfsec') {
       steps {
+        echo "=========== Execute tfsec ================="
         script{ 
           sh 'chmod 755 ./tfsecw.sh'
-          sh 'cat main.tf'
           sh './tfsecw.sh'
-          sh 'cat tfsec_result.xml'
+          
         }
       }
       post {
         always { 
           echo "=========always========="
-          junit checksName: 'Terraform security checks', testResults: "tfsec_result.xml"
+          junit skipPublishingChecks: true, testResults: 'tfsec_results.xml'
         }
-        success {
-          echo "Tfsec passed"
-        }
-        failure {
-          echo "Tfsec failed"
-        }
+        // success {
+        //   echo "Tfsec passed"
+        // }
+        // failure {
+        //   echo "Tfsec failed"
+        // }
       }
     }
     // stage('terraform') {
