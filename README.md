@@ -171,6 +171,34 @@ docker run --rm -v "$(pwd):/src" aquasec/tfsec /src --no-color
 - '/src' 검사할 대상 디렉토리이다. 컨테이너 내부의 디렉토리를 말한다. 
 - '--no-color' jenkins에서 처리결과를 단순 텍스트로 나타내기 위해서는 --no-color 옵션을 주면된다. 이렇게 하면 jenkins 처리 결과를 깔끔하게 복사할 수 있게 된다. 
 
+## docker가 아닌 tfsec 파일을 직접 받아서 실행하기 
+
+```py
+#!/bin/bash 
+
+echo "---------------------- Check directory"
+
+ls ./
+
+echo "----------------------- Run tfsec with docker"
+
+echo "$(pwd)"
+
+# tfsec 을 다운로드 받는다. 
+curl -fsSLO https://github.com/aquasecurity/tfsec/releases/download/v1.18.0/tfsec_1.18.0_linux_arm64.tar.gz
+
+# tfsec_dir 에 압축을 풀기 위해서 디렉토리를 생성한다. 
+mkdir "$(pwd)/tfsec_dir"
+
+# 압축을 특정 디렉토리에 해제한다. 
+tar xzvf tfsec_1.18.0_linux_arm64.tar.gz -C "$(pwd)/tfsec_dir"
+
+# tfsec을 실행하고, 결과를 tfsec_results.xml 에 저장한다. 저장 타입은 junit 타입으로 저장하게 된다. 
+$(pwd)/tfsec_dir/tfsec . -f junit > tfsec_results.xml
+
+```
+
+- 위와 같이 직접 tfsec 을 다운로드 받아서 실행한다. 
 ## terraformw 파일 작성하기 
 
 - terraformw는 tfswitch 를 이용하여 최신 테라폼을 설치하고, 이를 이용하여 terraform 을 실행하도록 해준다. 
@@ -241,12 +269,31 @@ pipeline {
       }
     }
     stage('tfsec') {
+      failFast true
       steps {
+        echo "=========== Execute tfsec ================="
         sh 'chmod 755 ./tfsecw.sh'
         sh './tfsecw.sh'
       }
+
+      post {
+        always { 
+          echo "========= Check tfsec test results ========="
+          junit allowEmptyResults: true, testResults: 'tfsec_results.xml', skipPublishingChecks: true
+        }
+        success {
+          echo "Tfsec passed" 
+        }
+        unstable {
+          error "TfSec Unstable"
+        }
+        failure {
+          error "Tfsec failed"
+        }
+      }
     }
     stage('terraform') {
+      failFast true
       steps {
         sh 'ls .'
         sh 'chmod 755 ./terraformw'
@@ -288,6 +335,28 @@ pipeline {
 ```
 
 - 체크아웃 받은 소스에서 tfsecw.sh 파일의 실행 권한을 변경하고, sh 명령으로 쉘스크립트를 실행한다. 
+
+```py
+      post {
+        always { 
+          echo "========= Check tfsec test results ========="
+          junit allowEmptyResults: true, testResults: 'tfsec_results.xml', skipPublishingChecks: true
+        }
+        success {
+          echo "Tfsec passed" 
+        }
+        unstable {
+          error "TfSec Unstable"
+        }
+        failure {
+          error "Tfsec failed"
+        }
+      }
+```
+
+- 스테이지가 완료되면, junit을 거쳐 tfsec 결과파일인 tfsec_results.xml 을 검사한다. 
+- unstable, failure 인경우 error을 발생시킨다. 
+- 이후 작업은 'failFast true'에 따라 다음 작업을 진행하지 않게 된다. 
 
 ```py
     stage('terraform') {

@@ -49,14 +49,14 @@ pipeline {
         }
       }
     }
-    stage('terraform') {
-      failFast true
-      steps {
-        sh 'ls .'
-        sh 'chmod 755 ./terraformw'
-        sh './terraformw apply -auto-approve -no-color'
-      }
-    }
+    // stage('terraform') {
+    //   failFast true
+    //   steps {
+    //     sh 'ls .'
+    //     sh 'chmod 755 ./terraformw'
+    //     sh './terraformw apply -auto-approve -no-color'
+    //   }
+    // }
   }
   post {
     always {
