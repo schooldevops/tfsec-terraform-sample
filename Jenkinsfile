@@ -33,11 +33,7 @@ pipeline {
         }
       }
       steps {
-        sh '''
-          ls
-        ```
-      }
-      steps {
+        sh 'ls .'
         sh '''
           tfsec . --no-color
         '''
