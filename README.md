@@ -292,14 +292,14 @@ pipeline {
         }
       }
     }
-    stage('terraform') {
-      failFast true
-      steps {
-        sh 'ls .'
-        sh 'chmod 755 ./terraformw'
-        sh './terraformw apply -auto-approve -no-color'
-      }
-    }
+    // stage('terraform') {
+    //   failFast true
+    //   steps {
+    //     sh 'ls .'
+    //     sh 'chmod 755 ./terraformw'
+    //     sh './terraformw apply -auto-approve -no-color'
+    //   }
+    // }
   }
   post {
     always {
@@ -432,4 +432,42 @@ output "jenkins_terraform" {
 - 모두 작성이 되었다면 "지금 빌드" 를 실행해보자. 
 
 ![item_07](imgs/item_07.png)
+
+## 실행결과 (정상 케이스)
+
+- 우리가 테스트할 main.tf 코드는 정상케이스인 경우이다. 
+
+```py
+resource "aws_elasticache_replication_group" "bad_example" {
+         replication_group_id = "foo"
+         replication_group_description = "my foo cluster"
+         transit_encryption_enabled = true
+         at_rest_encryption_enabled = true
+ }
+
+output "jenkins_terraform" {
+  value = "running Terraform from Jenkins"
+}
+```
+
+![build_01](imgs/build_01.png)
+
+- 정상적으로 파이프라인이 실행 되었다. 
+
+## 실행결과 (비정상 케이스)
+
+- 이제는 main.tf에 문제가 있는 경우이다. 
+
+```py
+resource "aws_elasticache_replication_group" "bad_example" {
+         replication_group_id = "foo"
+         replication_group_description = "my foo cluster"
+         transit_encryption_enabled = false
+         at_rest_encryption_enabled = false
+ }
+
+output "jenkins_terraform" {
+  value = "running Terraform from Jenkins"
+}
+```
 
