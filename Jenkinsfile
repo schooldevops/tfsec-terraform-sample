@@ -42,11 +42,11 @@ pipeline {
         }
         unstable {
           error "TfSec Unstable"
-          throw Exception('Unstable')
+          // throw Exception('Unstable')
         }
         failure {
           error "Tfsec failed"
-          throw Exception('Unstable')
+          // throw Exception('Unstable')
         }
       }
     }
