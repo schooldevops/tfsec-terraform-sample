@@ -41,11 +41,9 @@ pipeline {
           echo "Tfsec passed" 
         }
         unstable {
-          currentBuild.result = 'ABORTED'
           error "TfSec Unstable"
         }
         failure {
-          currentBuild.result = 'ABORTED'
           error "Tfsec failed"
         }
       }
