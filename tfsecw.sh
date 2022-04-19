@@ -16,7 +16,7 @@ curl -fsSL https://github.com/aquasecurity/tfsec/releases/download/v1.18.0/tfsec
 
 # mkdir "$(pwd)/tfsec_dir"
 
-tar xzvf tfsec_1.18.0_linux_arm64.tar.gz
+# tar xzvf tfsec_1.18.0_linux_arm64.tar.gz
 
 ls -alt .
 
@@ -28,9 +28,9 @@ ls -alt .
 
 # $(pwd)/tfsec_dir/tfsec . -f junit > tfsec_results.xml
 
-chmod 755 tfsec
+# chmod 755 tfsec
 
-./tfsec . -f junit > tfsec_results.xml
+# ./tfsec . -f junit > tfsec_results.xml
 
 # ls -lat $(pwd)
 
