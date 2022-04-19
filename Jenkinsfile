@@ -63,12 +63,12 @@ pipeline {
           echo "=========always========="
           junit allowEmptyResults: true, testResults: 'tfsec_results.xml'
         }
-        // success {
-        //   echo "Tfsec passed"
-        // }
-        // failure {
-        //   echo "Tfsec failed"
-        // }
+        success {
+          echo "Tfsec passed"
+        }
+        failure {
+          echo "Tfsec failed"
+        }
       }
     }
     // stage('terraform') {
