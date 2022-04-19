@@ -1,14 +1,14 @@
 
 pipeline {
   agent { label 'linux'}
+  environment {
+    def dockerHome = tool 'myDocker'
+    PATH = "${dockerHome}/bin:${env.PATH}"
+  }
+  options {
+    skipDefaultCheckout(true)
+  }
   try {
-    environment {
-      def dockerHome = tool 'myDocker'
-      PATH = "${dockerHome}/bin:${env.PATH}"
-    }
-    options {
-      skipDefaultCheckout(true)
-    }
     stages{
       stage('clean workspace') {
         steps {
@@ -65,8 +65,8 @@ pipeline {
       }
     }
   } catch (e) {
-  currentBuild.result = 'ABORTED'
-  echo('Aborted Pipeline')
-  return
+    currentBuild.result = 'ABORTED'
+    echo('Aborted Pipeline')
+    return
   }
 }
