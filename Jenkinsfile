@@ -34,26 +34,26 @@ pipeline {
 
       }
     }
-    // stage('check') {
-    //   always { 
-    //     echo "========= Check tfsec test results ========="
-    //     junit allowEmptyResults: true, testResults: 'tfsec_results.xml', skipPublishingChecks: true
-    //   }
-    //   success {
-    //     echo "Tfsec passed"
-    //   }
-    //   unstable {
-    //     error "TfSec Unstable"
-    //   }
-    //   failure {
-    //     error "Tfsec failed"
-    //   }
-    // }
     stage('terraform') {
       steps {
         sh 'ls .'
         sh 'chmod 755 ./terraformw'
         sh './terraformw apply -auto-approve -no-color'
+      }
+    }
+    post('check') {
+      always { 
+        echo "========= Check tfsec test results ========="
+        junit allowEmptyResults: true, testResults: 'tfsec_results.xml', skipPublishingChecks: true
+      }
+      success {
+        echo "Tfsec passed"
+      }
+      unstable {
+        error "TfSec Unstable"
+      }
+      failure {
+        error "Tfsec failed"
       }
     }
   }
