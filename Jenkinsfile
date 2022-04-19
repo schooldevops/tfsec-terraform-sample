@@ -1,7 +1,7 @@
 
 pipeline {
+  agent { label 'linux'}
   try {
-    agent { label 'linux'}
     environment {
       def dockerHome = tool 'myDocker'
       PATH = "${dockerHome}/bin:${env.PATH}"
@@ -68,5 +68,5 @@ pipeline {
   currentBuild.result = 'ABORTED'
   echo('Aborted Pipeline')
   return
-}
+  }
 }
