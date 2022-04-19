@@ -339,3 +339,28 @@ output "jenkins_terraform" {
 
 - 이제 Jenkins에서 새로운 아이템을 만들자. 
 
+- 새로운 Item을 클릭한다.
+  
+![item_02](imgs/item_02.png)
+
+- 아이템 이름은 tfsec_test로 하자. 
+- 유형은 Pipeline 을 선택하고 "OK"를 클릭한다. 
+  
+![item_03](imgs/item_03.png)
+
+- 설명을 대충 작성하고, 저장되는 빌드 개수는 "오래된 빌드 삭제" 에서 5개만 유지하게 하자. 
+  
+![item_04](imgs/item_04.png)
+
+- 파이프라인에서 다음과 같이 선택한다. 
+- Definition: Pipeline script from SCM 을 선택한다. 
+- SCM: Git 을 선택한다. (만약 다른 SVC툴을 이용한다면 플러그인을 별도로 설치해 주어야한다.)
+- Repository URL: https://github.com/schooldevops/tfsec-terraform-sample.git 으로 우리가 작성한 소스코드 경로를 넣어준다. 
+- 나머지 부분은 그대로 둔다. 
+![item_05](imgs/item_05.png)
+![item_06](imgs/item_06.png)
+
+- 모두 작성이 되었다면 "지금 빌드" 를 실행해보자. 
+
+![item_07](imgs/item_07.png)
+
