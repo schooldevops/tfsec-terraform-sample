@@ -335,3 +335,7 @@ output "jenkins_terraform" {
 - 우선 'bad_example' 을 먼저 작성하고 good_example은 주석처리해 둔다. 
 - 그리고 github에 커밋하자. 
 
+## Jenkins Job 생성하기. 
+
+- 이제 Jenkins에서 새로운 아이템을 만들자. 
+
