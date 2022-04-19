@@ -14,13 +14,15 @@ echo "$(pwd)"
 
 curl -fsSL https://github.com/aquasecurity/tfsec/releases/download/v1.18.0/tfsec_1.18.0_linux_arm64.tar.gz
 
-tar xzvf tfsec_1.18.0_linux_arm64.tar.gz --directory ./tfsec_dir
+mkdir "$(pwd)/tfsec_dir"
 
-ls -alt ./tfsec_dir 
+tar xzvf tfsec_1.18.0_linux_arm64.tar.gz -C "$(pwd)/tfsec_dir"
 
-chmod 755 ./tfsec_dir/bin/tfsec
+ls -alt "$(pwd)/tfsec_dir"
 
-./tfsec_dir . -f junit > tfsec_results.xml
+chmod -R 755 "$(pwd)/tfsec_dir"
+
+$(pwd)/tfsec_dir/tfsec . -f junit > tfsec_results.xml
 
 # ls -lat $(pwd)
 
