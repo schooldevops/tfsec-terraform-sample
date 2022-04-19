@@ -27,6 +27,7 @@ pipeline {
     stage('tfsec') {
       steps {
         sh 'chmod 755 ./tfsecw.sh'
+        sh 'cat main.tf'
         sh './tfsecw.sh'
       }
     }
