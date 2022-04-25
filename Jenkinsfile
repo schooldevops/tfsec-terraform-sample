@@ -31,8 +31,7 @@ pipeline {
         // sh 'docker run --rm -i -v "$(pwd):/src" aquasec/tfsec /src --no-color'
         sh 'chmod 755 ./tfsecw.sh'
         sh './tfsecw.sh'
-      }
-      steps {
+       
         result_file = sh(script: 'cat tfsec_results.xml', returnStdout: true)
       }
 
