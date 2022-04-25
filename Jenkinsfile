@@ -32,10 +32,10 @@ pipeline {
         sh 'chmod 755 ./tfsecw.sh'
         sh './tfsecw.sh'
 
-        def result_file = sh (
-          script: 'cat tfsec_results.xml'
-        )
+        
       }
+
+      def result_file = sh (script: 'cat tfsec_results.xml', returnStdout:true).trim()
       
       post {
         always { 
