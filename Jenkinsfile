@@ -31,6 +31,10 @@ pipeline {
         // sh 'docker run --rm -i -v "$(pwd):/src" aquasec/tfsec /src --no-color'
         sh 'chmod 755 ./tfsecw.sh'
         sh './tfsecw.sh'
+
+        result_file = sh (
+          script: 'cat tfsec_results.xml'
+        )
       }
 
       post {
@@ -43,11 +47,11 @@ pipeline {
           echo "Tfsec passed" 
         }
         unstable {
-          slackSend channel: '', color: 'danger', message: 'FAILED', teamDomain: '', tokenCredentialId: 'secret-text' 
+          slackSend channel: '', color: 'danger', message: '${result_file}', teamDomain: '', tokenCredentialId: 'secret-text' 
           error "TfSec Unstable"
         }
         failure {
-          slackSend channel: '', color: 'danger', message: 'FAILED', teamDomain: '', tokenCredentialId: 'secret-text' 
+          slackSend channel: '', color: 'danger', message: '${result_file}', teamDomain: '', tokenCredentialId: 'secret-text' 
           error "Tfsec failed"
         }
       }
