@@ -50,8 +50,8 @@ pipeline {
               script: 'cat tfsec_results.xml',
               returnStdout: true
             ).trim()
+            slackSend channel: '', color: 'danger', message: 'Unstable: ${TFSEC_RESULTS}', teamDomain: '', tokenCredentialId: 'secret-text' 
           }
-          slackSend channel: '', color: 'danger', message: '${TFSEC_RESULTS}', teamDomain: '', tokenCredentialId: 'secret-text' 
           error "TfSec Unstable"
         }
         failure {
@@ -60,8 +60,8 @@ pipeline {
               script: 'cat tfsec_results.xml',
               returnStdout: true
             ).trim()
+            slackSend channel: '', color: 'danger', message: 'Failed: ${TFSEC_RESULTS}', teamDomain: '', tokenCredentialId: 'secret-text' 
           }
-          slackSend channel: '', color: 'danger', message: '${TFSEC_RESULTS}', teamDomain: '', tokenCredentialId: 'secret-text' 
           error "Tfsec failed"
         }
       }
