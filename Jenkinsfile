@@ -39,16 +39,16 @@ pipeline {
           junit allowEmptyResults: true, testResults: 'tfsec_results.xml', skipPublishingChecks: true
         }
         success {
-          echo "Tfsec passed" 
           slackSend channel: '', color: 'good', message: 'SUCCESSFUL', teamDomain: '', tokenCredentialId: 'secret-text'
+          echo "Tfsec passed" 
         }
         unstable {
+          slackSend channel: '', color: 'danger', message: 'FAILED', teamDomain: '', tokenCredentialId: 'secret-text' 
           error "TfSec Unstable"
-           slackSend channel: '', color: 'danger', message: 'FAILED', teamDomain: '', tokenCredentialId: 'secret-text' 
         }
         failure {
+          slackSend channel: '', color: 'danger', message: 'FAILED', teamDomain: '', tokenCredentialId: 'secret-text' 
           error "Tfsec failed"
-           slackSend channel: '', color: 'danger', message: 'FAILED', teamDomain: '', tokenCredentialId: 'secret-text' 
         }
       }
     }
