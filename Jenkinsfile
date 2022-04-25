@@ -35,12 +35,12 @@ pipeline {
         sh(script: 'cat tfsec_results.xml', returnStdout: true)
 
         script {
-          GIT_COMMIT_EMAIL = sh (
+          TFSEC_RESULTS = sh (
             script: 'cat tfsec_results.xml',
             returnStdout: true
           ).trim()
         }
-        echo "Git committer email: ${GIT_COMMIT_EMAIL}"
+        echo "Tfsec Results: ${TFSEC_RESULTS}"
       }
 
       
@@ -54,12 +54,12 @@ pipeline {
           echo "Tfsec passed" 
         }
         unstable {
-          slackSend channel: '', color: 'danger', message: '${result_file}', teamDomain: '', tokenCredentialId: 'secret-text' 
+          slackSend channel: '', color: 'danger', message: '${TFSEC_RESULTS}', teamDomain: '', tokenCredentialId: 'secret-text' 
           error "TfSec Unstable"
         }
         failure {
           
-          slackSend channel: '', color: 'danger', message: '${result_file}', teamDomain: '', tokenCredentialId: 'secret-text' 
+          slackSend channel: '', color: 'danger', message: '${TFSEC_RESULTS}', teamDomain: '', tokenCredentialId: 'secret-text' 
           error "Tfsec failed"
         }
       }
