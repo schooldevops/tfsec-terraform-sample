@@ -44,12 +44,12 @@ pipeline {
           echo "Tfsec passed" 
         }
         unstable {
-          def result_file = sh (script: 'cat tfsec_results.xml', returnStdout:true).trim()
+          result_file = readFile('tfsec_results.xml')
           slackSend channel: '', color: 'danger', message: '${result_file}', teamDomain: '', tokenCredentialId: 'secret-text' 
           error "TfSec Unstable"
         }
         failure {
-          def result_file = sh (script: 'cat tfsec_results.xml', returnStdout:true).trim()
+          result_file = readFile('tfsec_results.xml')
           slackSend channel: '', color: 'danger', message: '${result_file}', teamDomain: '', tokenCredentialId: 'secret-text' 
           error "Tfsec failed"
         }
