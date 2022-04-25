@@ -33,6 +33,14 @@ pipeline {
         sh './tfsecw.sh'
        
         sh(script: 'cat tfsec_results.xml', returnStdout: true)
+
+        script {
+          GIT_COMMIT_EMAIL = sh (
+            script: 'cat tfsec_results.xml',
+            returnStdout: true
+          ).trim()
+        }
+        echo "Git committer email: ${GIT_COMMIT_EMAIL}"
       }
 
       
