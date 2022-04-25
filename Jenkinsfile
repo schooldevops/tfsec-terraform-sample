@@ -32,7 +32,7 @@ pipeline {
         sh 'chmod 755 ./tfsecw.sh'
         sh './tfsecw.sh'
        
-        result_file = sh(script: 'cat tfsec_results.xml', returnStdout: true)
+        sh(script: 'cat tfsec_results.xml', returnStdout: true)
       }
 
       
