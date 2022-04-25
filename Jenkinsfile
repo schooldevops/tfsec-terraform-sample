@@ -33,17 +33,8 @@ pipeline {
         sh './tfsecw.sh'
        
         sh(script: 'cat tfsec_results.xml', returnStdout: true)
-
-        script {
-          TFSEC_RESULTS = sh (
-            script: 'cat tfsec_results.xml',
-            returnStdout: true
-          ).trim()
-        }
-        echo "Tfsec Results: ${TFSEC_RESULTS}"
       }
 
-      
       post {
         always { 
           echo "========= Check tfsec test results ========="
@@ -54,11 +45,22 @@ pipeline {
           echo "Tfsec passed" 
         }
         unstable {
+          script {
+            TFSEC_RESULTS = sh (
+              script: 'cat tfsec_results.xml',
+              returnStdout: true
+            ).trim()
+          }
           slackSend channel: '', color: 'danger', message: '${TFSEC_RESULTS}', teamDomain: '', tokenCredentialId: 'secret-text' 
           error "TfSec Unstable"
         }
         failure {
-          
+          script {
+            TFSEC_RESULTS = sh (
+              script: 'cat tfsec_results.xml',
+              returnStdout: true
+            ).trim()
+          }
           slackSend channel: '', color: 'danger', message: '${TFSEC_RESULTS}', teamDomain: '', tokenCredentialId: 'secret-text' 
           error "Tfsec failed"
         }
