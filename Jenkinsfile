@@ -35,7 +35,6 @@ pipeline {
 
       
       post {
-        def result_file = sh (script: 'cat tfsec_results.xml', returnStdout:true).trim()
         always { 
           echo "========= Check tfsec test results ========="
           junit allowEmptyResults: true, testResults: 'tfsec_results.xml', skipPublishingChecks: true
@@ -45,10 +44,12 @@ pipeline {
           echo "Tfsec passed" 
         }
         unstable {
+          def result_file = sh (script: 'cat tfsec_results.xml', returnStdout:true).trim()
           slackSend channel: '', color: 'danger', message: '${result_file}', teamDomain: '', tokenCredentialId: 'secret-text' 
           error "TfSec Unstable"
         }
         failure {
+          def result_file = sh (script: 'cat tfsec_results.xml', returnStdout:true).trim()
           slackSend channel: '', color: 'danger', message: '${result_file}', teamDomain: '', tokenCredentialId: 'secret-text' 
           error "Tfsec failed"
         }
