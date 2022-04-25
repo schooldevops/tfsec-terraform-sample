@@ -40,12 +40,15 @@ pipeline {
         }
         success {
           echo "Tfsec passed" 
+          slackSend channel: '', color: 'good', message: 'SUCCESSFUL', teamDomain: '', tokenCredentialId: 'secret-text'
         }
         unstable {
           error "TfSec Unstable"
+           slackSend channel: '', color: 'danger', message: 'FAILED', teamDomain: '', tokenCredentialId: 'secret-text' 
         }
         failure {
           error "Tfsec failed"
+           slackSend channel: '', color: 'danger', message: 'FAILED', teamDomain: '', tokenCredentialId: 'secret-text' 
         }
       }
     }
