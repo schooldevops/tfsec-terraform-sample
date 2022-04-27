@@ -1,6 +1,8 @@
 #!/bin/bash 
 
-tfsec_dir = '$(pwd)/tfsec_dir/'
+tfsec_dir='$(pwd)/tfsec_dir/'
+
+echo $tfsec_dir
 cd elasticache
 
 echo "checking variable for [$1]"
