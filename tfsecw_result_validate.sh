@@ -2,6 +2,7 @@
 
 echo "Install JQ"
 
+mkdir -p ./jq_dir
 curl -L https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 -o ./jq_dir/jq
 
 chmod 755 ./jq_dir/jq
