@@ -16,7 +16,7 @@ node_type="cache.t4g.micro"
 multi_az_enabled=true
 
 // 암호화 설정 및 읽기 전용 replica의 자동 승격 여부
-at_rest_encryption_enabled=true
+at_rest_encryption_enabled=false
 transit_encryption_enabled=true
 automatic_failover_enabled=true
 

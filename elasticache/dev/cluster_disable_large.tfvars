@@ -15,7 +15,7 @@ number_cache_clusters=3
 
 // node의 수가 최소 2개 이상일때 true 가능
 multi_az_enabled=true
-at_rest_encryption_enabled=true
+at_rest_encryption_enabled=false
 transit_encryption_enabled=true
 automatic_failover_enabled=true
 
