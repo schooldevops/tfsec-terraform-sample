@@ -47,7 +47,7 @@ pipeline {
         unstable {
           script {
             TFSEC_RESULTS = sh (
-              script: 'cat tfsec_results.xml',
+              script: 'cat dev/results/*.json',
               returnStdout: true
             ).trim()
             slackSend channel: '', color: 'danger', message: "[tfsec terraform] Unstable: ${TFSEC_RESULTS}", teamDomain: '', tokenCredentialId: 'secret-text' 
@@ -57,7 +57,7 @@ pipeline {
         failure {
           script {
             TFSEC_RESULTS = sh (
-              script: 'cat tfsec_results.xml',
+              script: 'cat dev/results/*.json',
               returnStdout: true
             ).trim()
             slackSend channel: '', color: 'danger', message: "[tfsec terraform] Failed: ${TFSEC_RESULTS}", teamDomain: '', tokenCredentialId: 'secret-text' 
