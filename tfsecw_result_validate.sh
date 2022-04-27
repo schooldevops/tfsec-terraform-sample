@@ -10,6 +10,8 @@ resultDir="$1/results"
 
 echo $resultDir
 
+jq --help
+
 if [ -d $resultDir ]
 then
     for entry in "${resultDir}"/*
