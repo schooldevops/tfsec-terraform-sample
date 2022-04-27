@@ -2,7 +2,9 @@
 
 echo "Install JQ"
 
-sudo apt-get update && sudo apt-get install jq
+curl -L https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 -o ./jq_dir/jq
+
+chmod 755 ./jq_dir/jq
 
 echo "checking tfsec results for [$1]"
 
@@ -18,7 +20,7 @@ then
     do
         if [ -f $entry ]; then
             echo $entry
-            check_result=`jq '.results | length > 0' $entry`
+            check_result=`./jq_dir/jq '.results | length > 0' $entry`
             if [ "$check_result" = false ] ; then 
                 rm $entry
             fi
@@ -30,7 +32,7 @@ then
         if [ -f $entry ]
         then
             echo $entry
-            check_result=`jq '.results | length > 0' $entry`
+            check_result=`./jq_dir/jq '.results | length > 0' $entry`
             if [ "$check_result" = true ] ; then 
                 echo 'Error exists in results'
                 exit 3

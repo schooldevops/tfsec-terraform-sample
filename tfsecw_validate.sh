@@ -20,8 +20,9 @@ do
 
     `${tfsec_dir}tfsec . --tfvars-file $entry -f json > ${entryAr}".json"`
     mv ${entryAr}".json" ${resultDir}${fileAr}".json"
-    echo "-----------------------------------------------"
-    ls -alf ${resultDir}
 done
+
+echo "-----------------------------------------------"
+ls -alf ${resultDir}
 
 
