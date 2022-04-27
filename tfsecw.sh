@@ -20,7 +20,7 @@ tar xzvf tfsec_1.18.0_linux_arm64.tar.gz -C "$(pwd)/tfsec_dir"
 
 # ls -alt "$(pwd)/tfsec_dir"
 
-$(pwd)/tfsec_dir/tfsec . -f junit > tfsec_results.xml
+# $(pwd)/tfsec_dir/tfsec . -f junit > tfsec_results.xml
 
-echo "------------------------------------------------"
-cat tfsec_results.xml
+# echo "------------------------------------------------"
+# cat tfsec_results.xml
