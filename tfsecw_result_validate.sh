@@ -2,7 +2,7 @@
 
 echo "Install JQ"
 
-apt-get update && apt-get install jq
+sudo apt-get update && sudo apt-get install jq
 
 echo "checking tfsec results for [$1]"
 
