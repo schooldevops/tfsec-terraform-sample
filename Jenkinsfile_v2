@@ -36,10 +36,10 @@ pipeline {
       }
 
       post {
-        always { 
-          echo "========= Check tfsec test results ========="
-          junit allowEmptyResults: true, testResults: 'tfsec_results.xml', skipPublishingChecks: true
-        }
+        // always { 
+        //   echo "========= Check tfsec test results ========="
+        //   junit allowEmptyResults: true, testResults: 'tfsec_results.xml', skipPublishingChecks: true
+        // }
         success {
           slackSend channel: '', color: 'good', message: 'SUCCESSFUL', teamDomain: '', tokenCredentialId: 'secret-text'
           echo "Tfsec passed" 
