@@ -1,5 +1,6 @@
 #!/bin/bash 
 
+tfsec_dir = '$(pwd)/tfsec_dir/'
 cd elasticache
 
 echo "checking variable for [$1]"
@@ -15,7 +16,7 @@ do
     fileAr=`echo ${entryAr} | cut -d '/' -f 2`
     mkdir -p ${resultDir}
 
-    tfsec . --tfvars-file $entry -f json > ${entryAr}".json"
+    ${tfsec_dir}tfsec . --tfvars-file $entry -f json > ${entryAr}".json"
     mv ${entryAr}".json" ${resultDir}${fileAr}".json"
     # echo "-----------------------------------------------"
 done
