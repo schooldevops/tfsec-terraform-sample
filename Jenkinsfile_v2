@@ -2,8 +2,8 @@
 pipeline {
   agent any
   environment {
-    // def dockerHome = tool 'myDocker'
-    // PATH = "${dockerHome}/bin:${env.PATH}"
+    def dockerHome = tool 'myDocker'
+    PATH = "${dockerHome}/bin:${env.PATH}"
   }
   options {
     skipDefaultCheckout(true)
@@ -16,7 +16,7 @@ pipeline {
     }
     stage('Initialize') {
       steps {
-        // echo "env ${env.PATH}"
+        echo "env ${env.PATH}"
       }
     }
     stage('checkout') {
