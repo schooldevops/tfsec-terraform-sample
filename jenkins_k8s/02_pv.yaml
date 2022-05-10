@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  # name: my-jenkins-pv
+  name: pv-statefulset-jenkins-0
+  namespace: jenkins
+spec:
+  storageClassName: my-jenkins-storage
+  capacity:
+    storage: 2Gi
+  local:
+    path: /Users/1111489/Documents/80.DATAS/local-jenkins-storage
+  persistentVolumeReclaimPolicy: Delete
+  claimRef:
+    namespace: jenkins
+    name: my-jenkins-pvc
+  accessModes:
+  - ReadWriteOnce
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - GLW4XPMQ2X

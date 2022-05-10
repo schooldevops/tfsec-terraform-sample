@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: jenkins
+  namespace: jenkins
+  labels:
+    app: jenkins
+spec:
+  replicas: 1
+  serviceName: jenkins
+  selector:
+    matchLabels:
+      app: jenkins
+  template:
+    metadata:
+      labels:
+        app: jenkins
+    spec:
+      containers:
+        - name: myjenkins
+          image: jenkins/jenkins
+          volumeMounts:
+          - mountPath: "/var/jenkins_home"
+            name: volume
+          ports:
+          - containerPort: 8080
+  volumeClaimTemplates:
+    - metadata:
+        name: volume
+        namespace: storage
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 500Mi
+      # volumes:
+      #   - name: volume
+      #     persistentVolumeClaim:
+      #       claimName: my-jenkins-pvc
